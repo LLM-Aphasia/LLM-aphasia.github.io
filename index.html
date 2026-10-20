@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Language Impairment as a Lens onto Large Language Models</title>
+  <meta name="description" content="Project page for &quot;Language Impairment as a Lens onto Large Language Models&quot;: inducing aphasia-like breakdowns in LLMs by classifier-guided lesioning of attention heads and by steering with directions computed from patients' speech." />
+  <meta property="og:title" content="Language Impairment as a Lens onto Large Language Models" />
+  <meta property="og:description" content="We induce aphasia-like breakdowns in 11 LLMs by knocking out attention heads and by steering activations, and diagnose them with a five-way clinical classifier. Language functions isolate into circuits and vectors, densely entangled across aphasia types; steering generalizes, lesions stay local." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://llm-aphasia.github.io/" />
+  <meta property="og:image" content="https://llm-aphasia.github.io/assets/img/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400..700;1,400..700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+  <link rel="stylesheet" href="assets/style.css?v=20261020c" />
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="#top"><img class="brand-mark" src="favicon.svg" alt="" width="20" height="20" />LLM Aphasia</a>
+  <nav aria-label="Sections">
+    <a href="#lens">Lens</a>
+    <a href="#method">Method</a>
+    <a href="#circuits">Circuits &amp; vectors</a>
+    <a href="#entanglement">Entanglement</a>
+    <a href="#generalization">Generalization</a>
+    <a href="#healing">Steering back</a>
+    <a href="#examples">Examples</a>
+    <a href="#bibtex">Cite</a>
+  </nav>
+  <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch between light and dark mode">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z" fill="currentColor"/></svg>
+  </button>
+</header>
+
+<main id="top">
+
+<!-- ============================ HERO ============================ -->
+<section class="hero">
+  <h1>
+    <span class="title-name">Language Impairment</span> as a Lens<br class="title-break" />
+    onto Large Language Models
+  </h1>
+
+  <!-- Authors, affiliations and links are filled from assets/main.js → CONFIG -->
+  <div class="authors" id="authors"></div>
+  <div class="affils" id="affils"></div>
+  <div class="links" id="links"></div>
+
+  <p class="lede">
+    Large language models spread language across highly distributed representations, yet a focal disruption can still
+    break them — much as a localized brain injury causes <em>aphasia</em> in humans. We borrow the clinician's lens:
+    we induce aphasia-like breakdowns in 11 LLMs in two complementary ways,
+    <mark class="hl-lesion">knocking out attention heads</mark> and
+    <mark class="hl-steer">steering activations along directions computed from patients' speech</mark>,
+    and diagnose every answer with a five-way clinical classifier.
+  </p>
+
+  <div class="intro">
+    <p>
+      Seen through this lens, a model's language turns out to be both separable and shared.
+      Guided by the classifier, lesions <a href="#circuits">isolate language functions</a> to discrete sets of attention
+      heads, and directions computed from patients' speech isolate them to continuous vectors in the residual stream:
+      either intervention alone can make a model speak with a targeted type of aphasia, and the lesion search succeeds
+      far more often when the clinical classifier, rather than corpus statistics, guides it.
+    </p>
+    <p>
+      Yet these functions are <a href="#entanglement">densely entangled</a>. The heads whose loss yields Broca-like speech
+      overlap with those behind Wernicke-like speech far more than chance would predict, and the two steering directions
+      point nearly the same way, with only a small part of each setting one type apart. The two routes into the model
+      also <a href="#generalization">generalize asymmetrically</a>: a steering direction carries its type to prompts it
+      was never chosen on, whereas a lesion damages language broadly but leaves its type on the narrative where it was
+      found.
+    </p>
+  </div>
+</section>
+
+<!-- ============================ 01 LENS ============================ -->
+<section id="lens" aria-labelledby="lens-title">
+  <div class="sec-head">
+    <span class="kicker mono">01 · The lens</span>
+    <h2 id="lens-title">Aphasia as a diagnostic lens on model failures</h2>
+    <p>
+      Neuropsychology mapped the brain's language system by watching how language breaks down after focal injury.
+      Perplexity and accuracy only tell us <em>that</em> a model is degrading; aphasia's clinical taxonomy tells us
+      <em>how</em>. Toggle between the two interventions below.
+    </p>
+  </div>
+
+  <div class="demo-tabs" role="tablist" aria-label="Intervention">
+    <button role="tab" aria-selected="true" data-case="lesion">Lesion · Llama-2-7B-chat</button>
+    <button role="tab" aria-selected="false" data-case="steer">Steer · Qwen3.5-9B</button>
+  </div>
+  <p class="prompt-line mono"><span>prompt</span> Tell me as much of the story of Cinderella as you can.</p>
+  <div class="diff-stage" id="demo">
+    <figure class="pane">
+      <figcaption class="pane-head mono"><span class="dot" style="--c: var(--cls-control)"></span>intact model</figcaption>
+      <p class="speech" id="demo-intact"></p>
+      <div class="verdict"><span class="pill" style="--c: var(--cls-control)">Control speech</span></div>
+    </figure>
+    <div class="arrow" aria-hidden="true">
+      <span class="mono" id="demo-action"></span>
+      <svg viewBox="0 0 40 16"><path d="M0 8h36M29 2l7 6-7 6" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+    </div>
+    <figure class="pane">
+      <figcaption class="pane-head mono"><span class="dot" id="demo-dot"></span><span id="demo-out-label"></span></figcaption>
+      <p class="speech impaired" id="demo-out"></p>
+      <div class="verdict" id="demo-verdict"></div>
+    </figure>
+  </div>
+  <p class="fig-note">Verbatim excerpts from Figure 1 of the paper; “…” marks omitted text.</p>
+
+  <h3 class="classes-title">Five classes, one of them for machines</h3>
+  <div class="classes" id="classes"></div>
+</section>
+
+<!-- ============================ 02 METHOD ============================ -->
+<section id="method" aria-labelledby="method-title">
+  <div class="sec-head">
+    <span class="kicker mono">02 · Method</span>
+    <h2 id="method-title">Two interventions, one clinical yardstick</h2>
+    <p>Both interventions act on a frozen model, and both are judged by the same classifier. Lesioning targets the model's structural “hardware”; steering targets its representational “software”.</p>
+  </div>
+
+  <figure class="fig img-fig">
+    <div class="img-frame"><img src="assets/img/pipeline.png" alt="Left: CLAMP scores a head set by the classifier's target probability for the lesioned model's answer, ranks heads once, grows the set until the probability exceeds 0.5, and prunes it. Right: steering extracts hidden states of AphasiaBank transcripts, computes Broca and Wernicke vectors as patient minus control means, and adds the vector at a layer and strength picked by the classifier." width="2200" height="778" loading="lazy" /></div>
+    <figcaption><b>Left:</b> CLAMP ranks heads by their score alone, knocks out the top <i>k</i> until the target probability exceeds 0.5, and prunes the set. <b>Right:</b> a subtype vector, the patients' minus the controls' mean hidden state, is added at a layer and strength chosen by the classifier.</figcaption>
+  </figure>
+
+  <ol class="steps">
+    <li>
+      <span class="step-n mono">1</span>
+      <h3>A classifier that tells aphasia from machine failure</h3>
+      <p>Prior lesion methods meant to induce aphasia instead produce model failures, which human experts identify as model scrambles. Our classifier tells the two apart: it combines a LoRA-tuned BGE-large encoder with 14 text features, averaged over 20 seeds, and is trained on AphasiaBank transcripts plus 259 labeled model scrambles.</p>
+      <div class="eq"><div class="tex-block">\begin{aligned} P(\mathrm{aphasia}) = \; &P(\mathrm{Cond./Anomic}) \\ +\, &P(\mathrm{Broca}) + P(\mathrm{Wernicke}) \end{aligned}</div></div>
+      <p class="small">83.3% accuracy and 0.78 macro-F1 on held-out transcripts.</p>
+    </li>
+    <li>
+      <span class="step-n mono">2</span>
+      <h3>CLAMP: lesion the heads the classifier points to</h3>
+      <p>Classifier-guided Lesion Accumulation with Minimal Pruning zeroes the outputs of attention heads at every position. It ranks heads by the score of each alone, grows the set in that order until the score exceeds 0.5, then prunes heads while it stays above.</p>
+      <div class="eq"><div class="tex-block">\begin{aligned} s(H) &= P(\text{target} \mid H \text{ knocked out}) \\ s(H) &> 0.5 \end{aligned}</div></div>
+      <p class="small">In the final set, restoring any single head brings <i>s</i>(<i>H</i>) to 0.5 or below.</p>
+    </li>
+    <li>
+      <span class="step-n mono">3</span>
+      <h3>Steering: add a direction from patients' speech</h3>
+      <p>The model reads every human transcript as if it were its own answer. A subtype vector is the mean residual stream of Broca (or Wernicke) transcripts minus that of control transcripts; adding it at one layer steers generation.</p>
+      <div class="eq"><div class="tex-block">\mathbf{v}_\ell = \tfrac{1}{|T|}\textstyle\sum_{x\in T} h_\ell(x) - \tfrac{1}{|C|}\sum_{x\in C} h_\ell(x)</div></div>
+      <p class="small">A sweep over 8 layers and 8 strengths picks where and how hard to push.</p>
+    </li>
+  </ol>
+
+  <figure class="fig img-fig side">
+    <div class="img-frame"><img src="assets/img/classifier.png" alt="Classifier architecture: AphasiaBank Cinderella and sandwich transcripts plus model scrambles feed a BGE-large encoder with LoRA (1,024-dimensional embedding) and 14 text features on length, repetition, word use and cosine similarity to each group; the concatenation (1,038 dimensions) goes into a small network, ensembled over 20 models, that outputs five class probabilities." width="1500" height="1066" loading="lazy" /></div>
+    <figcaption>
+      <h3>The five-way classifier</h3>
+      <p>It is trained on the AphasiaBank Cinderella and sandwich transcripts and on labeled model scrambles, using 14 text features and a text embedding, and is ensembled over 20 seeds.</p>
+      <p class="small">We study 11 models from four families: GPT-2 XL; Llama-2-7B-chat and Llama-2-13B-chat; Pythia-1B, 1.4B, 2.8B and 6.9B; and Qwen3.5-0.8B, 2B, 4B and 9B. All of them answer the AphasiaBank prompts with greedy decoding.</p>
+    </figcaption>
+  </figure>
+</section>
+
+<!-- ============================ 03 CIRCUITS & VECTORS ============================ -->
+<section id="circuits" aria-labelledby="circuits-title">
+  <div class="sec-head">
+    <span class="kicker mono">03 · Finding 1</span>
+    <h2 id="circuits-title">Language functions isolate into circuits and vectors</h2>
+    <p>Both interventions can induce a targeted aphasia type: through discrete sets of attention heads, and through continuous directions in the residual stream.</p>
+  </div>
+
+  <div class="two-col">
+    <div class="prose">
+      <h3>Classifier-guided search outperforms corpus-based search</h3>
+      <p>Across 42 settings (seven models, two tasks, three targets), lesion methods guided by corpus statistics almost never produce a Broca- or Wernicke-like answer.</p>
+      <p>Lesioning heads under the classifier works best. CLAMP succeeds in <b>38 of 42</b> settings, against 25 for Param-C, which lesions parameters, and 23 for Head-CEM, whose more aggressive optimization leaves 12 of its 19 failures as model scrambles.</p>
+    </div>
+    <figure class="fig chart" data-figure="methods">
+      <div class="chart-tools">
+        <div class="seg" role="tablist" aria-label="Target" data-control="methods-target">
+          <button role="tab" aria-selected="true" data-value="all">All targets</button>
+          <button role="tab" aria-selected="false" data-value="aphasia">Aphasia</button>
+          <button role="tab" aria-selected="false" data-value="broca">Broca</button>
+          <button role="tab" aria-selected="false" data-value="wernicke">Wernicke</button>
+        </div>
+        <button class="table-toggle mono" type="button" aria-pressed="false">table</button>
+      </div>
+      <div class="chart-body" data-chart="methods"></div>
+      <figcaption><b>Settings in which each lesion method finds a lesion that reaches its target</b>, by the five-way classifier, of 42 for all targets or 14 for one (Table 2).</figcaption>
+    </figure>
+  </div>
+
+  <figure class="fig chart wide" data-figure="heatmap">
+    <div class="chart-tools">
+      <div class="seg" role="tablist" aria-label="Intervention" data-control="heatmap-view">
+        <button role="tab" aria-selected="true" data-value="lesion">CLAMP lesions</button>
+        <button role="tab" aria-selected="false" data-value="steer">Steering vectors</button>
+      </div>
+      <button class="table-toggle mono" type="button" aria-pressed="false">table</button>
+    </div>
+    <div class="chart-body" data-chart="heatmap"></div>
+    <figcaption id="heatmap-caption"></figcaption>
+  </figure>
+
+  <div class="callouts">
+    <div class="callout">
+      <h3>The heads of a lesion act together</h3>
+      <p>Restoring the clean outputs of all of a lesion's heads while the model reads the prompt undoes 53 of the 54 lesions. Restoring a single head undoes the lesion for a median 83% of heads, yet the classifier labels 80% of those answers model scrambles and only 13% control speech.</p>
+    </div>
+    <div class="callout">
+      <h3>A lesion that keeps the story</h3>
+      <p>Knocking out 101 heads of Llama-2-13B-chat turns its fluent Cinderella story into <q>to tell a tale of Ct.. to tell me.</q> with <i>P</i>(Broca) = 0.89, while the model still confirms that it knows the story.</p>
+    </div>
+    <div class="callout">
+      <h3>Experts confirm the steered types</h3>
+      <p>Two experts labeled the steered answers of seven models. Either expert identifies the targeted type for 58% of the Broca answers and 58% of the Wernicke answers, although steering toward Broca's aphasia often scrambles the model.</p>
+    </div>
+  </div>
+
+  <figure class="fig chart wide side" data-figure="human">
+    <div>
+      <div class="chart-tools"><span></span><button class="table-toggle mono" type="button" aria-pressed="false">table</button></div>
+      <div class="chart-body" data-chart="human"></div>
+    </div>
+    <figcaption>
+      <h3>What the experts call the steered answers</h3>
+      <p>Answers steered toward Broca's or Wernicke's aphasia, by target and prompt. <em>Source task</em>: the narrative whose answers chose the steering layer and strength; <em>other prompts</em>: the other narrative and the five connected-text prompts of the Text Aphasia Battery (TAB).</p>
+      <p class="small">An answer counts as the target when either expert labels it so; any other answer is split evenly between its two experts' labels (Figure 5).</p>
+    </figcaption>
+  </figure>
+</section>
+
+<!-- ============================ 04 ENTANGLEMENT ============================ -->
+<section id="entanglement" aria-labelledby="ent-title">
+  <div class="sec-head">
+    <span class="kicker mono">04 · Finding 2</span>
+    <h2 id="ent-title">Aphasia types are densely entangled</h2>
+    <p>Distinct aphasic profiles share their mechanisms: Broca and Wernicke lesions share many heads, and the Broca and Wernicke directions point nearly the same way.</p>
+  </div>
+
+  <div class="fig-row">
+    <figure class="fig chart" data-figure="overlap">
+      <div class="chart-tools"><span class="chart-title">Heads shared by the Broca and Wernicke lesions</span><button class="table-toggle mono" type="button" aria-pressed="false">table</button></div>
+      <div class="chart-body" data-chart="overlap"></div>
+      <figcaption><b>Lesions for different types share heads.</b> For each of the 13 model–task pairs with both lesions: the share of the smaller lesion's heads that the other lesion also knocks out, against the share expected if both were drawn at random. In all, 517 heads are shared against 165 by chance, and the overlap is significant (<i>p</i> &lt; 0.01) in 11 of 13 pairs.</figcaption>
+    </figure>
+    <figure class="fig chart" data-figure="cosine">
+      <div class="chart-tools">
+        <div class="seg" role="tablist" aria-label="Task" data-control="cosine-task">
+          <button role="tab" aria-selected="true" data-value="Cinderella">Cinderella</button>
+          <button role="tab" aria-selected="false" data-value="Sandwich">Sandwich</button>
+        </div>
+        <button class="table-toggle mono" type="button" aria-pressed="false">table</button>
+      </div>
+      <div class="chart-body" data-chart="cosine"></div>
+      <figcaption><b>The Broca and Wernicke directions share most of their length.</b> Median cosine over a model's layers between the two vectors of one task, the same comparison after shuffling the two labels among the transcripts, and the two vectors' type-specific parts once the general aphasia direction is projected out.</figcaption>
+    </figure>
+  </div>
+
+  <div class="callouts">
+    <div class="callout">
+      <h3>Overlap begins at single heads</h3>
+      <p>A head whose knockout makes the answer more Broca-like usually makes it more Wernicke-like too: the two single-head rankings correlate at a median Spearman <i>ρ</i> of 0.93.</p>
+    </div>
+    <div class="callout">
+      <h3>Both lie along the aphasia direction</h3>
+      <p>The Broca and Wernicke directions point nearly along each other (median cosines 0.79–0.90) and along the direction of all aphasic transcripts (0.97 for Broca, 0.92 for Wernicke).</p>
+    </div>
+    <div class="callout">
+      <h3>A small part sets each type apart</h3>
+      <p>The type-specific parts point away from each other (−0.65 to −0.41), and the Wernicke part alone pushes <i>P</i>(Wernicke) above 0.5 in all 22 model–task pairs.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 05 GENERALIZATION ============================ -->
+<section id="generalization" aria-labelledby="gen-title">
+  <div class="sec-head">
+    <span class="kicker mono">05 · Finding 3</span>
+    <h2 id="gen-title">Asymmetric generalization: steering carries its type, lesions do not</h2>
+    <p>Almost every lesion found on one narrative also damages the model's language on new prompts, but the type it induces stays on that narrative. A steering direction carries its type to prompts it was never chosen on.</p>
+  </div>
+
+  <div class="fig-row">
+    <figure class="fig chart" data-figure="carry">
+      <div class="chart-tools"><span class="chart-title">Targeted type on new prompts</span><button class="table-toggle mono" type="button" aria-pressed="false">table</button></div>
+      <div class="chart-body" data-chart="carry"></div>
+      <figcaption><b>The type follows the direction, not the lesion.</b> Share of answers to new prompts (the other narrative and the TAB's five connected-text prompts) that the classifier labels with the targeted type, for the Broca and Wernicke interventions of the seven models with expert labels.</figcaption>
+    </figure>
+    <figure class="fig chart" data-figure="beyond">
+      <div class="chart-tools"><span class="chart-title">Aphasia features in connected text</span><button class="table-toggle mono" type="button" aria-pressed="false">table</button></div>
+      <div class="chart-body" data-chart="beyond"></div>
+      <figcaption><b>The lesions still damage language on new prompts.</b> Median number of the TAB's 19 aphasia features that an LLM judge finds per connected-text answer, before and after the lesion, by model family (Table 3).</figcaption>
+    </figure>
+  </div>
+
+  <ul class="stats compact" aria-label="Generalization results">
+    <li><b class="num">65% · 63%</b><span>of Broca- and Wernicke-steered answers to new prompts that either expert labels with the targeted type (answers that are not model scrambles)</span></li>
+    <li><b class="num">44 <small>of</small> 76</b><span>Broca-steered answers to new prompts labeled Broca-like, against 13 of 77 Wernicke-steered ones</span></li>
+    <li><b class="num">4 <small>of</small> 15</b><span>TAB short-answer items the lesioned models get right (median), against 8.5 for the same models intact</span></li>
+    <li><b class="num">50 <small>of</small> 54</b><span>lesions in whose connected text the LLM judge finds more aphasia features than in the intact model's</span></li>
+  </ul>
+
+  <figure class="fig img-fig side flip">
+    <div class="img-frame"><img src="assets/img/tsne_answers.png" alt="t-SNE maps of the Cinderella and sandwich tasks: human transcripts colored by group and model scrambles in gray, with intact model answers as white circles, lesioned answers as triangles (top row) and steered answers as diamonds (bottom row). Steered Broca answers sit among Broca transcripts, lesioned Broca answers near the model scrambles." width="1300" height="1313" loading="lazy" /></div>
+    <figcaption>
+      <h3>In a text space that knows nothing of our labels</h3>
+      <p>Placed among the human transcripts by a frozen sentence encoder, answers steered toward Broca's aphasia lie among Broca transcripts, which make up 57% and 43% of their nearest texts on the two tasks. Answers lesioned toward Broca's aphasia lie near the model scrambles, which make up 53% and 37% of theirs.</p>
+      <p class="small">Intact answers: white circles; lesioned answers: triangles (top); steered answers: diamonds (bottom); a hollow marker does not reach its target (Figure 8).</p>
+    </figcaption>
+  </figure>
+</section>
+
+<!-- ============================ 06 STEERING BACK ============================ -->
+<section id="healing" aria-labelledby="heal-title">
+  <div class="sec-head">
+    <span class="kicker mono">06 · Steering back</span>
+    <h2 id="heal-title">Steering back undoes the lesions, but does not heal them</h2>
+    <p>Removing a lesion's own direction from the residual stream after every block moves nearly every answer off its target, but almost always into model scrambles, and random directions do almost as well.</p>
+  </div>
+  <div class="two-col reverse">
+    <figure class="fig chart" data-figure="rescue">
+      <div class="chart-tools"><span class="chart-title">The 54 lesions, with their own direction removed</span><button class="table-toggle mono" type="button" aria-pressed="false">table</button></div>
+      <div class="chart-body" data-chart="rescue"></div>
+    </figure>
+    <div class="prose">
+      <h3>Undoing a lesion is easy, but unspecific</h3>
+      <p>Removing the own direction undoes <b>53 of the 54</b> lesions, and the classifier labels <b>52</b> of these answers model scrambles and none of them control speech.</p>
+      <p>Removing one of three random directions undoes 50 or 51 of the lesions. Pushing with a random direction of the same norm at a single layer undoes the lesion in 91% of the pushes, against 95% for the lesion's own direction.</p>
+      <p class="aside">Nearly every perturbation we tried moves the answer off its target, mostly into model scrambles rather than back to control speech.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 07 YARDSTICK ============================ -->
+<section id="yardstick" aria-labelledby="yard-title">
+  <div class="sec-head">
+    <span class="kicker mono">07 · The yardstick</span>
+    <h2 id="yard-title">The classifier agrees with experts more often than an LLM judge</h2>
+    <p>Across all steered answers, including those to out-of-distribution TAB prompts, the classifier matches either expert's label on 65% of answers, against 55% for a DeepSeek-V4.1-Flash judge.</p>
+  </div>
+  <div class="two-col">
+    <div class="prose">
+      <h3>Where the advantage comes from</h3>
+      <p>Much of it comes from the 77 answers that the experts identified as model scrambles: the classifier agrees with either expert on <b>51</b> of them, the judge on <b>23</b>.</p>
+      <p>The two experts agree with each other on 80% of the answers, with a pooled Cohen's <i>κ</i> of 0.76.</p>
+      <p class="aside">Labels from the classifier and the LLM judge are assistive signals, not clinical diagnoses.</p>
+    </div>
+    <figure class="fig chart" data-figure="agreement">
+      <div class="chart-tools"><span class="chart-title">Agreement with either expert (%)</span><button class="table-toggle mono" type="button" aria-pressed="false">table</button></div>
+      <div class="chart-body" data-chart="agreement"></div>
+      <figcaption><b>Two-way:</b> answers steered toward aphasia, labeled aphasic or not. <b>Five-way:</b> answers steered toward Broca's or Wernicke's aphasia, labeled with the classifier's five classes (Table 4).</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============================ 08 EXAMPLES ============================ -->
+<section id="examples" aria-labelledby="ex-title">
+  <div class="sec-head">
+    <span class="kicker mono">08 · Examples</span>
+    <h2 id="ex-title">What the impaired models say</h2>
+    <p>Single greedy answers, verbatim (Tables 15 and 32 of the paper); a line break in an answer is shown as one.</p>
+  </div>
+  <div class="demo-tabs" role="tablist" aria-label="Example set">
+    <button role="tab" aria-selected="true" data-set="lesion">Lesioned by CLAMP</button>
+    <button role="tab" aria-selected="false" data-set="steer">Steered, labeled by experts</button>
+  </div>
+  <div class="examples" id="examples-grid"></div>
+</section>
+
+<!-- ============================ TAKEAWAY ============================ -->
+<section class="takeaway" aria-label="Takeaway">
+  <blockquote>
+    LLMs, functionally analogous to biological brains, rely on a densely entangled architecture that can be systematically mapped through clinically informed interventions.
+  </blockquote>
+</section>
+
+<!-- ============================ BIBTEX ============================ -->
+<section class="bib" id="bibtex" aria-labelledby="bib-title">
+  <div class="sec-head">
+    <span class="kicker mono">09 · Citation</span>
+    <h2 id="bib-title">Citation</h2>
+  </div>
+  <div class="bib-box">
+    <button class="copy mono" id="copy-bib" type="button">copy</button>
+    <pre class="mono" id="bib-text"></pre>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <p>Language Impairment as a Lens onto Large Language Models · code under the MIT License · AphasiaBank transcripts are not redistributed.</p>
+</footer>
+
+<div class="chart-tip" id="chart-tip" role="tooltip"></div>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="assets/data.js?v=20261020c"></script>
+<script defer src="assets/main.js?v=20261020c"></script>
+<script defer src="assets/charts.js?v=20261020c"></script>
+</body>
+</html>
