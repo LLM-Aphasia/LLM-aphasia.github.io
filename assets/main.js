@@ -16,7 +16,7 @@ const CONFIG = {
   affiliations: [
     "University of Southern California",
     "University of California, Berkeley",
-    "University of Michigan",
+    "Independent Researcher",
     "University of Colorado Anschutz Medical Campus",
   ],
   contact: ["muxuanhe@usc.edu", "wangzhu@berkeley.edu", "ychen249@usc.edu"],
