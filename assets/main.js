@@ -21,15 +21,19 @@ const CONFIG = {
   ],
   contact: ["muxuanhe@usc.edu", "wangzhu@berkeley.edu", "ychen249@usc.edu"],
   links: {
-    arxiv: "",                                               // arXiv abstract page, once available
+    arxiv: "https://arxiv.org/abs/2610.28992",              // arXiv abstract page
+    pdf: "https://arxiv.org/pdf/2610.28992",                // the paper's PDF on arXiv
     code: "https://github.com/Bill1235813/llm_aphasia",     // GitHub repository
   },
   bibtex: {
     key: "he2026language",
     title: "Language Impairment as a Lens onto Large Language Models",
-    author: "He, Muxuan and Zhu, Wang Bill and Chen, Yue and Kaiser, Elsi and\n             Du, Weizhi and Du, Yao and Nastase, Samuel and Gao, Yanjun",
-    journal: "arXiv preprint",
+    author: "He, Muxuan and Zhu, Wang Bill and Chen, Yue and Kaiser, Elsi and\n                   Du, Weizhi and Du, Yao and Nastase, Samuel and Gao, Yanjun",
     year: "2026",
+    eprint: "2610.28992",
+    archivePrefix: "arXiv",
+    primaryClass: "cs.CL",
+    url: "https://arxiv.org/abs/2610.28992",
   },
 };
 
@@ -37,7 +41,8 @@ const ICONS = {
   arxiv: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 4l14 16M19 4L12 12M5 20l4.5-5"/></svg>',
   code: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.89 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.56 9.56 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0 0 12 2z"/></svg>',
 };
-const LINK_LABELS = { arxiv: "arXiv", code: "Code" };
+ICONS.pdf = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5h8l4 4v15H6z"/><path d="M14 2.5v4h4M9 12.5h6M9 16h6"/></svg>';
+const LINK_LABELS = { arxiv: "arXiv", pdf: "PDF", code: "Code" };
 
 /* Small DOM helper: element with attributes and text, never parsed as HTML. */
 function h(tag, attrs = {}, ...children) {
@@ -194,7 +199,8 @@ function renderExamples(set) {
 /* ============ Citation ============ */
 function renderBib() {
   const b = CONFIG.bibtex;
-  const text = `@article{${b.key},\n  title   = {${b.title}},\n  author  = {${b.author}},\n  journal = {${b.journal}},\n  year    = {${b.year}}\n}`;
+  const text = `@misc{${b.key},\n  title         = {${b.title}},\n  author        = {${b.author}},\n  year          = {${b.year}},\n` +
+    `  eprint        = {${b.eprint}},\n  archivePrefix = {${b.archivePrefix}},\n  primaryClass  = {${b.primaryClass}},\n  url           = {${b.url}}\n}`;
   document.getElementById("bib-text").textContent = text;
   const button = document.getElementById("copy-bib");
   button.addEventListener("click", async () => {
