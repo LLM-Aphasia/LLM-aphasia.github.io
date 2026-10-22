@@ -28,12 +28,9 @@ const CONFIG = {
   bibtex: {
     key: "he2026language",
     title: "Language Impairment as a Lens onto Large Language Models",
-    author: "He, Muxuan and Zhu, Wang Bill and Chen, Yue and Kaiser, Elsi and\n                   Du, Weizhi and Du, Yao and Nastase, Samuel and Gao, Yanjun",
+    author: "He, Muxuan and Zhu, Wang Bill and Chen, Yue and Kaiser, Elsi and Du, Weizhi and Du, Yao and Nastase, Samuel and Gao, Yanjun",
+    journal: "arXiv preprint arXiv:2610.28992",
     year: "2026",
-    eprint: "2610.28992",
-    archivePrefix: "arXiv",
-    primaryClass: "cs.CL",
-    url: "https://arxiv.org/abs/2610.28992",
   },
 };
 
@@ -199,8 +196,7 @@ function renderExamples(set) {
 /* ============ Citation ============ */
 function renderBib() {
   const b = CONFIG.bibtex;
-  const text = `@misc{${b.key},\n  title         = {${b.title}},\n  author        = {${b.author}},\n  year          = {${b.year}},\n` +
-    `  eprint        = {${b.eprint}},\n  archivePrefix = {${b.archivePrefix}},\n  primaryClass  = {${b.primaryClass}},\n  url           = {${b.url}}\n}`;
+  const text = `@article{${b.key},\n  title   = {${b.title}},\n  author  = {${b.author}},\n  journal = {${b.journal}},\n  year    = {${b.year}}\n}`;
   document.getElementById("bib-text").textContent = text;
   const button = document.getElementById("copy-bib");
   button.addEventListener("click", async () => {
